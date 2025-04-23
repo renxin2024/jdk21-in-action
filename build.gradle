@@ -1,0 +1,108 @@
+plugins {
+    id 'java-library'
+    id 'idea'
+    id 'org.springframework.boot' version '3.4.3'
+    id 'io.spring.dependency-management' version '1.1.7'
+    // 使用jdk21需要使用此插件，规避JDK本身的模块导出限制
+    id "io.freefair.lombok" version "8.6"
+}
+
+group = 'cn.renxinblog'
+version = '0.0.1'
+
+
+jar{
+    enabled = false
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+tasks.withType(JavaCompile).tap {
+    configureEach {
+        options.encoding = 'UTF-8'
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+dependencyManagement {
+    // 引入cola-components-bom
+    imports {
+        mavenBom "com.alibaba.cola:cola-components-bom:${colaVersion}"
+    }
+}
+
+dependencies {
+    // springboot
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-configuration-processor'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    implementation 'de.codecentric:spring-boot-admin-starter-client:3.4.3'
+
+    developmentOnly 'org.springframework.boot:spring-boot-starter-actuator'
+    // mac 兼容
+    implementation "io.netty:netty-resolver-dns-native-macos:4.1.107.Final:osx-aarch_64"
+
+    // r2dbc
+    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+    implementation 'io.r2dbc:r2dbc-h2'
+    // H2 数据库
+    runtimeOnly 'com.h2database:h2'
+
+    // cola components
+    implementation 'com.alibaba.cola:cola-component-dto'
+    implementation 'com.alibaba.cola:cola-component-exception'
+
+    // tools
+    implementation 'com.google.guava:guava:33.4.0-jre'
+    implementation 'cn.hutool:hutool-all:5.8.36'
+    implementation "org.apache.commons:commons-lang3"
+
+    // api doc
+    implementation "com.github.xiaoymin:knife4j-openapi3-jakarta-spring-boot-starter:${knife4jVersion}"
+    // lombok
+    compileOnly "org.projectlombok:lombok:1.18.30"
+    annotationProcessor "org.projectlombok:lombok:1.18.30"
+
+    // test
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+// 所有模块排除 log4j
+configurations {
+
+    configureEach {
+        exclude module: 'log4j'
+        exclude module: 'slf4j-log4j12'
+        exclude module: 'commons-logging'
+    }
+    // 避免重复编译
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+test {
+    useJUnitPlatform()
+}

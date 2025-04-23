@@ -1,0 +1,39 @@
+
+spring:
+  threads:
+    virtual:
+      enabled: true
+  application:
+    name: jdk21-in-action
+  boot:
+    admin:
+      client:
+        url: http://localhost:8888/admin
+  r2dbc:
+    url: r2dbc:h2:mem:///jdk21-in-action
+    username: root
+    password: root
+    pool:
+      initial-size: 10
+      max-size: 100
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema.sql
+      data-locations: classpath:db/data.sql
+
+  main:
+    web-application-type: reactive
+logging:
+  level:
+    org.springframework.r2dbc: DEBUG
+
+management:
+  server:
+    port: 81
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+server:
+  port: 80

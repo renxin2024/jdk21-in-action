@@ -1,0 +1,1 @@
+insert into paper_author (`name`, `email`) values ('renxin','renxin2024@gmail.com');
